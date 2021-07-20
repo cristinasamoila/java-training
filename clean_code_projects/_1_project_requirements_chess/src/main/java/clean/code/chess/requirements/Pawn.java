@@ -1,50 +1,32 @@
 package clean.code.chess.requirements;
 
-public class Pawn {
+import java.awt.*;
 
-    private ChessBoard chessBoard;
-    private int xCoordinate;
-    private int yCoordinate;
-    private PieceColor pieceColor;
+public class Pawn extends Piece {
 
-    public Pawn(PieceColor pieceColor) {
-        this.pieceColor = pieceColor;
+    private final String Type = "Pawn";
+
+    public Pawn(PieceColor color) {
+        super(color);
     }
 
-    public ChessBoard getChesssBoard() {
-        return chessBoard;
+    @Override
+    public String getType() {
+        return Type;
     }
 
-    public void setChessBoard(ChessBoard chessBoard) {
-        this.chessBoard = chessBoard;
+    @Override
+    public void Move(MovementType movementType, Position newPosition) {
+        if (ChessBoard.getInstance().IsLegalBoardPosition(newPosition) && isValidNewPosition(newPosition)) {
+            ChessBoard.getInstance().mapOfPositionAndPiece.put(getPosition(), null);
+            super.setPositionOnChessBoard(ChessBoard.getInstance(), newPosition);
+            ChessBoard.getInstance().mapOfPositionAndPiece.put(newPosition, this);
+        }
     }
 
-    public int getXCoordinate() {
-        return xCoordinate;
-    }
-
-    public void setXCoordinate(int value) {
-        this.xCoordinate = value;
-    }
-
-    public int getYCoordinate() {
-        return yCoordinate;
-    }
-
-    public void setYCoordinate(int value) {
-        this.yCoordinate = value;
-    }
-
-    public PieceColor getPieceColor() {
-        return this.pieceColor;
-    }
-
-    private void setPieceColor(PieceColor value) {
-        pieceColor = value;
-    }
-
-    public void Move(MovementType movementType, int newX, int newY) {
-        throw new UnsupportedOperationException("Need to implement Pawn.Move()") ;
+    @Override
+    public void Capture(MovementType movementType, int newX, int newY) {
+        throw new UnsupportedOperationException("Need to implement Pawn.Capture()");
     }
 
     @Override
@@ -52,8 +34,22 @@ public class Pawn {
         return CurrentPositionAsString();
     }
 
-    protected String CurrentPositionAsString() {
-        String eol = System.lineSeparator();
-        return String.format("Current X: {1}{0}Current Y: {2}{0}Piece Color: {3}", eol, xCoordinate, yCoordinate, pieceColor);
+
+    public boolean isValidNewPosition(Position newPosition) {
+        if (getPieceColor().equals(Color.WHITE))
+            return areMovingCoordinatesValid_WhiteCase(newPosition.getxCoordinate(), newPosition.getyCoordinate());
+        return areMovingCoordinatesValid_BlackCase(newPosition.getxCoordinate(), newPosition.getyCoordinate());
+    }
+
+
+    public boolean areMovingCoordinatesValid_WhiteCase(int xCoordinate, int yCoordinate) {
+        return yCoordinate == getPosition().getyCoordinate() &&
+                xCoordinate == getPosition().getxCoordinate() + 1;
+    }
+
+    public boolean areMovingCoordinatesValid_BlackCase(int xCoordinate, int yCoordinate) {
+        return yCoordinate == getPosition().getyCoordinate() &&
+                xCoordinate == getPosition().getxCoordinate() - 1;
+
     }
 }
